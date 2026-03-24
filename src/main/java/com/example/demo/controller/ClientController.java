@@ -2,6 +2,7 @@ package com.example.demo.controller;
 
 import com.example.demo.dto.ClientDTO;
 import com.example.demo.service.ClientService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -16,7 +17,7 @@ public class ClientController {
     private final ClientService clientService;
 
     @PostMapping
-    public ResponseEntity<ClientDTO> createClient(@RequestBody ClientDTO clientDTO) {
+    public ResponseEntity<ClientDTO> createClient(@RequestBody @Valid ClientDTO clientDTO) {
         return ResponseEntity.ok(clientService.createClient(clientDTO));
     }
 
@@ -27,14 +28,12 @@ public class ClientController {
 
     @GetMapping("/{id}")
     public ResponseEntity<ClientDTO> getClientById(@PathVariable Long id) {
-        ClientDTO client = clientService.getClientById(id);
-        return client != null ? ResponseEntity.ok(client) : ResponseEntity.notFound().build();
+        return ResponseEntity.ok(clientService.getClientById(id));
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<ClientDTO> updateClient(@PathVariable Long id, @RequestBody ClientDTO clientDTO) {
-        ClientDTO updatedClient = clientService.updateClient(id, clientDTO);
-        return updatedClient != null ? ResponseEntity.ok(updatedClient) : ResponseEntity.notFound().build();
+    public ResponseEntity<ClientDTO> updateClient(@PathVariable Long id, @RequestBody @Valid ClientDTO clientDTO) {
+        return ResponseEntity.ok(clientService.updateClient(id, clientDTO));
     }
 
     @DeleteMapping("/{id}")

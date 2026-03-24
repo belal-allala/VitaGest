@@ -1,12 +1,19 @@
 package com.example.demo.service;
 
+import com.example.demo.aop.AuditAction;
 import com.example.demo.dto.CommandeDTO;
-import com.example.demo.entity.Commande;
+import com.example.demo.entity.*;
+import com.example.demo.exception.ResourceNotFoundException;
 import com.example.demo.mapper.CommandeMapper;
-import com.example.demo.repository.CommandeRepository;
+import com.example.demo.repository.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -15,11 +22,66 @@ import java.util.stream.Collectors;
 public class CommandeService {
 
     private final CommandeRepository commandeRepository;
+    private final LotRepository lotRepository;
+    private final FournisseurRepository fournisseurRepository;
     private final CommandeMapper commandeMapper;
 
+    @Transactional
+    @AuditAction(action = "CREATION_COMMANDE", entityName = "Commande")
     public CommandeDTO createCommande(CommandeDTO commandeDTO) {
         Commande commande = commandeMapper.toEntity(commandeDTO);
+        commande.setDate(LocalDateTime.now());
+        commande.setStatut("BROUILLON");
+
+        BigDecimal total = commande.getLignes().stream()
+                .map(ligne -> ligne.getPrixAchat().multiply(BigDecimal.valueOf(ligne.getQuantite())))
+                .reduce(BigDecimal.ZERO, BigDecimal::add)
+                .setScale(2, RoundingMode.HALF_UP);
+        commande.setTotalAmount(total);
+
         return commandeMapper.toDTO(commandeRepository.save(commande));
+    }
+
+    @Transactional
+    @AuditAction(action = "RECEPTION_COMMANDE", entityName = "Commande")
+    public CommandeDTO recevoirCommande(Long commandeId) {
+        Commande commande = commandeRepository.findById(commandeId)
+                .orElseThrow(() -> new ResourceNotFoundException("Commande not found with ID: " + commandeId));
+
+        if ("RECUE".equals(commande.getStatut())) {
+            throw new IllegalStateException("La commande a déjà été reçue.");
+        }
+
+        commande.setStatut("RECUE");
+
+        for (CommandeLigne ligne : commande.getLignes()) {
+            Lot newLot = new Lot();
+            newLot.setMedicament(ligne.getMedicament());
+            newLot.setNumeroLot("CMD-" + commande.getId() + "-" + ligne.getId());
+            newLot.setQuantite(ligne.getQuantite());
+            newLot.setFabrication(LocalDateTime.now().toLocalDate());
+            newLot.setExpiration(ligne.getDateExpiration()); // Use the provided expiration date
+            lotRepository.save(newLot);
+        }
+
+        updateFournisseurPerformance(commande);
+
+        return commandeMapper.toDTO(commandeRepository.save(commande));
+    }
+
+    private void updateFournisseurPerformance(Commande commande) {
+        if (commande.getFournisseur() != null) {
+            Fournisseur fournisseur = commande.getFournisseur();
+            long deliveryDays = ChronoUnit.DAYS.between(commande.getDate(), LocalDateTime.now());
+            
+            Integer currentDelai = fournisseur.getDelaiMoyen();
+            if (currentDelai == null || currentDelai == 0) {
+                fournisseur.setDelaiMoyen((int) deliveryDays);
+            } else {
+                fournisseur.setDelaiMoyen((currentDelai + (int) deliveryDays) / 2);
+            }
+            fournisseurRepository.save(fournisseur);
+        }
     }
 
     public List<CommandeDTO> getAllCommandes() {
@@ -31,20 +93,37 @@ public class CommandeService {
     public CommandeDTO getCommandeById(Long id) {
         return commandeRepository.findById(id)
                 .map(commandeMapper::toDTO)
-                .orElse(null);
+                .orElseThrow(() -> new ResourceNotFoundException("Commande not found with ID: " + id));
     }
 
+    @Transactional
+    @AuditAction(action = "MISE_A_JOUR_COMMANDE", entityName = "Commande")
     public CommandeDTO updateCommande(Long id, CommandeDTO commandeDTO) {
         return commandeRepository.findById(id)
                 .map(existingCommande -> {
+                    if ("RECUE".equals(existingCommande.getStatut())) {
+                        throw new IllegalStateException("Cannot update a received order.");
+                    }
                     Commande updatedCommande = commandeMapper.toEntity(commandeDTO);
                     updatedCommande.setId(existingCommande.getId());
+                    BigDecimal total = updatedCommande.getLignes().stream()
+                        .map(ligne -> ligne.getPrixAchat().multiply(BigDecimal.valueOf(ligne.getQuantite())))
+                        .reduce(BigDecimal.ZERO, BigDecimal::add)
+                        .setScale(2, RoundingMode.HALF_UP);
+                    updatedCommande.setTotalAmount(total);
                     return commandeMapper.toDTO(commandeRepository.save(updatedCommande));
                 })
-                .orElse(null);
+                .orElseThrow(() -> new ResourceNotFoundException("Commande not found with ID: " + id));
     }
 
+    @Transactional
+    @AuditAction(action = "SUPPRESSION_COMMANDE", entityName = "Commande")
     public void deleteCommande(Long id) {
+        Commande commande = commandeRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Commande not found with ID: " + id));
+        if ("RECUE".equals(commande.getStatut())) {
+            throw new IllegalStateException("Cannot delete a received order.");
+        }
         commandeRepository.deleteById(id);
     }
 }

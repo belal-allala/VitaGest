@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 @Entity
@@ -16,7 +17,7 @@ public class Medicament {
     private String nom;
     private String forme;
     private String dosage;
-    private Double prix;
+    private BigDecimal prix;
     private String classe;
     private String codeAtc;
     private String vignetteUrl;

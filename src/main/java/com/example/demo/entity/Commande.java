@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -15,6 +16,7 @@ public class Commande {
     private Long id;
     private LocalDateTime date;
     private String statut; // BROUILLON, ENVOYEE, RECUE
+    private BigDecimal totalAmount;
 
     @ManyToOne
     @JoinColumn(name = "fournisseur_id")

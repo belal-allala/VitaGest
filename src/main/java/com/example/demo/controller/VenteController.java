@@ -2,6 +2,7 @@ package com.example.demo.controller;
 
 import com.example.demo.dto.VenteDTO;
 import com.example.demo.service.VenteService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -16,7 +17,7 @@ public class VenteController {
     private final VenteService venteService;
 
     @PostMapping
-    public ResponseEntity<VenteDTO> createVente(@RequestBody VenteDTO venteDTO) {
+    public ResponseEntity<VenteDTO> createVente(@RequestBody @Valid VenteDTO venteDTO) {
         return ResponseEntity.ok(venteService.createVente(venteDTO));
     }
 
@@ -27,19 +28,12 @@ public class VenteController {
 
     @GetMapping("/{id}")
     public ResponseEntity<VenteDTO> getVenteById(@PathVariable Long id) {
-        VenteDTO vente = venteService.getVenteById(id);
-        return vente != null ? ResponseEntity.ok(vente) : ResponseEntity.notFound().build();
-    }
-
-    @PutMapping("/{id}")
-    public ResponseEntity<VenteDTO> updateVente(@PathVariable Long id, @RequestBody VenteDTO venteDTO) {
-        VenteDTO updatedVente = venteService.updateVente(id, venteDTO);
-        return updatedVente != null ? ResponseEntity.ok(updatedVente) : ResponseEntity.notFound().build();
+        return ResponseEntity.ok(venteService.getVenteById(id));
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteVente(@PathVariable Long id) {
-        venteService.deleteVente(id);
+    public ResponseEntity<Void> cancelVente(@PathVariable Long id) {
+        venteService.cancelVente(id);
         return ResponseEntity.noContent().build();
     }
 }

@@ -8,7 +8,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Service
@@ -29,13 +28,13 @@ public class RoleService {
                 .collect(Collectors.toList());
     }
 
-    public RoleDTO getRoleById(UUID id) {
+    public RoleDTO getRoleById(Long id) {
         return roleRepository.findById(id)
                 .map(roleMapper::toDTO)
                 .orElse(null);
     }
 
-    public RoleDTO updateRole(UUID id, RoleDTO roleDTO) {
+    public RoleDTO updateRole(Long id, RoleDTO roleDTO) {
         return roleRepository.findById(id)
                 .map(existingRole -> {
                     Role updatedRole = roleMapper.toEntity(roleDTO);
@@ -45,7 +44,7 @@ public class RoleService {
                 .orElse(null);
     }
 
-    public void deleteRole(UUID id) {
+    public void deleteRole(Long id) {
         roleRepository.deleteById(id);
     }
 }

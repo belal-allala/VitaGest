@@ -5,14 +5,16 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.math.BigDecimal;
+
 @Entity
 @Data @NoArgsConstructor @AllArgsConstructor
 public class VenteLigne {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private Integer quantite;
-    private Double prixUnitaire;
-    private Double remise;
+    private BigDecimal prixUnitaire;
+    private BigDecimal remise;
 
     @ManyToOne
     @JoinColumn(name = "vente_id")

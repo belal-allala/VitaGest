@@ -2,6 +2,7 @@ package com.example.demo.controller;
 
 import com.example.demo.dto.CommandeDTO;
 import com.example.demo.service.CommandeService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -16,8 +17,13 @@ public class CommandeController {
     private final CommandeService commandeService;
 
     @PostMapping
-    public ResponseEntity<CommandeDTO> createCommande(@RequestBody CommandeDTO commandeDTO) {
+    public ResponseEntity<CommandeDTO> createCommande(@RequestBody @Valid CommandeDTO commandeDTO) {
         return ResponseEntity.ok(commandeService.createCommande(commandeDTO));
+    }
+
+    @PostMapping("/{id}/reception")
+    public ResponseEntity<CommandeDTO> recevoirCommande(@PathVariable Long id) {
+        return ResponseEntity.ok(commandeService.recevoirCommande(id));
     }
 
     @GetMapping
@@ -27,14 +33,12 @@ public class CommandeController {
 
     @GetMapping("/{id}")
     public ResponseEntity<CommandeDTO> getCommandeById(@PathVariable Long id) {
-        CommandeDTO commande = commandeService.getCommandeById(id);
-        return commande != null ? ResponseEntity.ok(commande) : ResponseEntity.notFound().build();
+        return ResponseEntity.ok(commandeService.getCommandeById(id));
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<CommandeDTO> updateCommande(@PathVariable Long id, @RequestBody CommandeDTO commandeDTO) {
-        CommandeDTO updatedCommande = commandeService.updateCommande(id, commandeDTO);
-        return updatedCommande != null ? ResponseEntity.ok(updatedCommande) : ResponseEntity.notFound().build();
+    public ResponseEntity<CommandeDTO> updateCommande(@PathVariable Long id, @RequestBody @Valid CommandeDTO commandeDTO) {
+        return ResponseEntity.ok(commandeService.updateCommande(id, commandeDTO));
     }
 
     @DeleteMapping("/{id}")
