@@ -1,0 +1,11 @@
+target/
+.git/
+*.mvn/
+.mvn/
+pom.xml.releaseBackup
+.idea/
+.vscode/
+*.iml
+*.log
+Dockerfile
+.dockerignore
