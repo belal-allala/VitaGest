@@ -66,9 +66,7 @@ public class VenteService {
 
         Vente savedVente = venteRepository.save(vente);
 
-        if (vente.getClient() != null) {
-            updateLoyaltyPoints(vente.getClient(), total, false); // Add points
-        }
+
 
         return venteMapper.toDTO(savedVente);
     }
@@ -88,16 +86,9 @@ public class VenteService {
         return venteLigne;
     }
 
-    private void updateLoyaltyPoints(Client client, BigDecimal total, boolean isRefund) {
-        int points = total.divide(BigDecimal.TEN, 0, RoundingMode.DOWN).intValue();
-        if (isRefund) {
-            client.setPointsFidelite(Math.max(0, client.getPointsFidelite() - points));
-        } else {
-            client.setPointsFidelite(client.getPointsFidelite() + points);
-        }
-        clientRepository.save(client);
-    }
 
+
+    @Transactional(readOnly = true)
     public List<VenteDTO> getAllVentes() {
         return venteRepository.findAll().stream()
                 .map(venteMapper::toDTO)
@@ -121,10 +112,7 @@ public class VenteService {
             stockService.restock(ligne.getMedicament().getId(), ligne.getQuantite());
         }
 
-        // Refund loyalty points
-        if (vente.getClient() != null) {
-            updateLoyaltyPoints(vente.getClient(), vente.getTotal(), true); // Refund points
-        }
+
 
         // Instead of deleting, we can mark it as cancelled to keep a record
         // For now, we delete as per the initial simplified instruction.

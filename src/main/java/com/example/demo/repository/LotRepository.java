@@ -14,4 +14,6 @@ public interface LotRepository extends JpaRepository<Lot, Long> {
     @Lock(LockModeType.PESSIMISTIC_WRITE)
     @Query("SELECT l FROM Lot l WHERE l.medicament.id = :medicamentId AND l.quantite > 0 ORDER BY l.expiration ASC")
     List<Lot> findLotsForDeduction(@Param("medicamentId") Long medicamentId);
+
+    List<Lot> findByMedicamentId(Long medicamentId);
 }

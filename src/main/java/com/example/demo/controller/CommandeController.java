@@ -26,6 +26,11 @@ public class CommandeController {
         return ResponseEntity.ok(commandeService.recevoirCommande(id));
     }
 
+    @PostMapping("/{id}/valider")
+    public ResponseEntity<CommandeDTO> validerCommande(@PathVariable Long id) {
+        return ResponseEntity.ok(commandeService.validerCommande(id));
+    }
+
     @GetMapping
     public ResponseEntity<List<CommandeDTO>> getAllCommandes() {
         return ResponseEntity.ok(commandeService.getAllCommandes());

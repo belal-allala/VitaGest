@@ -14,27 +14,32 @@ import org.springframework.stereotype.Service;
 @Service
 @RequiredArgsConstructor
 public class AuthenticationService {
-    private final UserRepository repository;
+    private final UserRepository userRepository;
     private final RoleRepository roleRepository;
+    private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
     private final AuthenticationManager authenticationManager;
-    private final PasswordEncoder passwordEncoder;
 
     public AuthenticationResponse register(AuthenticationRequest request) {
-        Role roleEmployee = roleRepository.findByNom("ROLE_EMPLOYEE")
-                .orElseThrow(() -> new IllegalStateException("ROLE_EMPLOYEE not found"));
+        String roleToFind = request.getRole() != null ? request.getRole() : "ROLE_PHARMACIEN";
+        Role role = roleRepository.findByNom(roleToFind)
+                .orElseThrow(() -> new IllegalStateException("Rôle non trouvé : " + roleToFind));
+                
         User user = User.builder()
-                .username(request.getEmail())
+                .nomComplet(request.getUsername())
                 .email(request.getEmail())
                 .password(passwordEncoder.encode(request.getPassword()))
-                .role(roleEmployee)
+                .role(role)
+                .active(true) // New users are active by default
                 .build();
-        repository.save(user);
-        String jwtToken = jwtService.generateToken(user);
+        userRepository.save(user);
+        var jwtToken = jwtService.generateToken(user);
         return AuthenticationResponse.builder()
                 .token(jwtToken)
-                .username(user.getUsername())
+                .username(user.getEmail())
                 .role(user.getRole().getNom())
+                .active(user.isActive())
+                .userId(user.getId())
                 .build();
     }
 
@@ -45,13 +50,15 @@ public class AuthenticationService {
                         request.getPassword()
                 )
         );
-        var user = repository.findByEmail(request.getEmail())
+        var user = userRepository.findByEmail(request.getEmail())
                 .orElseThrow();
         var jwtToken = jwtService.generateToken(user);
         return AuthenticationResponse.builder()
                 .token(jwtToken)
-                .username(user.getUsername())
+                .username(user.getEmail())
                 .role(user.getRole().getNom())
+                .active(user.isActive())
+                .userId(user.getId())
                 .build();
     }
 }

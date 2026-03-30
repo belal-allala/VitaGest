@@ -8,6 +8,7 @@ import org.mapstruct.Mapping;
 @Mapper(componentModel = "spring")
 public interface AuditLogMapper {
     @Mapping(source = "user.id", target = "userId")
+    @Mapping(source = "user.username", target = "userName")
     AuditLogDTO toDTO(AuditLog auditLog);
     
     @Mapping(source = "userId", target = "user.id")

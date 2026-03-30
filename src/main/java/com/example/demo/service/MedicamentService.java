@@ -29,13 +29,20 @@ public class MedicamentService {
 
     public List<MedicamentDTO> getAllMedicaments() {
         return medicamentRepository.findAll().stream()
-                .map(medicamentMapper::toDTO)
+                .map(this::toDTOWithStock)
                 .collect(Collectors.toList());
+    }
+
+    private MedicamentDTO toDTOWithStock(Medicament m) {
+        MedicamentDTO dto = medicamentMapper.toDTO(m);
+        int totalStock = (m.getLots() != null) ? m.getLots().stream().mapToInt(lot -> lot.getQuantite()).sum() : 0;
+        dto.setQuantiteEnStock(totalStock);
+        return dto;
     }
 
     public MedicamentDTO getMedicamentById(Long id) {
         return medicamentRepository.findById(id)
-                .map(medicamentMapper::toDTO)
+                .map(this::toDTOWithStock)
                 .orElseThrow(() -> new ResourceNotFoundException("Medicament not found with ID: " + id));
     }
 

@@ -27,4 +27,6 @@ public class MedicamentDTO {
     private String classe;
     private String codeAtc;
     private String vignetteUrl;
+    private String formeDosage;
+    private Integer quantiteEnStock;
 }

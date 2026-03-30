@@ -13,18 +13,22 @@ import java.util.Collection;
 import java.util.List;
 
 @Entity
-@Data @NoArgsConstructor @AllArgsConstructor @Builder
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 @Table(name = "users")
 public class User implements UserDetails {
-    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    
+
     @Column(unique = true, nullable = false)
-    private String username;
-    
+    private String nomComplet;
+
     @Column(unique = true, nullable = false)
     private String email;
-    
+
     @Column(nullable = false)
     private String password;
 
@@ -34,6 +38,10 @@ public class User implements UserDetails {
 
     @OneToMany(mappedBy = "user")
     private List<AuditLog> logs;
+
+    @Column(nullable = false, columnDefinition = "boolean default true")
+    @Builder.Default
+    private boolean active = true;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
@@ -57,7 +65,7 @@ public class User implements UserDetails {
 
     @Override
     public boolean isAccountNonLocked() {
-        return true;
+        return active; // Use active status for locking
     }
 
     @Override
@@ -67,6 +75,6 @@ public class User implements UserDetails {
 
     @Override
     public boolean isEnabled() {
-        return true;
+        return active;
     }
 }

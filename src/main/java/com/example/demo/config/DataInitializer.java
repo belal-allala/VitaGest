@@ -50,10 +50,10 @@ public class DataInitializer implements CommandLineRunner {
 
         // 2. Roles & Users
         Role adminRole = roleRepository.save(new Role(null, "ROLE_ADMIN"));
-        Role employeeRole = roleRepository.save(new Role(null, "ROLE_EMPLOYEE"));
+        Role pharmacienRole = roleRepository.save(new Role(null, "ROLE_PHARMACIEN"));
 
         User admin = User.builder()
-                .username("Administrator")
+                .nomComplet("Administrator")
                 .email("admin@vitagest.com")
                 .password(passwordEncoder.encode("admin123"))
                 .role(adminRole)
@@ -61,9 +61,9 @@ public class DataInitializer implements CommandLineRunner {
         userRepository.save(admin);
 
         List<User> employees = Arrays.asList(
-                User.builder().username("Ali Mansouri").email("ali@vitagest.com").password(passwordEncoder.encode("pass123")).role(employeeRole).build(),
-                User.builder().username("Sara El Fassi").email("sara@vitagest.com").password(passwordEncoder.encode("pass123")).role(employeeRole).build(),
-                User.builder().username("Omar Bennani").email("omar@vitagest.com").password(passwordEncoder.encode("pass123")).role(employeeRole).build()
+                User.builder().nomComplet("Ali Mansouri").email("ali@vitagest.com").password(passwordEncoder.encode("pass123")).role(pharmacienRole).build(),
+                User.builder().nomComplet("Sara El Fassi").email("sara@vitagest.com").password(passwordEncoder.encode("pass123")).role(pharmacienRole).build(),
+                User.builder().nomComplet("Omar Bennani").email("omar@vitagest.com").password(passwordEncoder.encode("pass123")).role(pharmacienRole).build()
         );
         userRepository.saveAll(employees);
 
@@ -139,26 +139,26 @@ public class DataInitializer implements CommandLineRunner {
         // 6. Clients & Loyalty
         // Order: id, nom, prenom, email, tel, allergies, pointsFidelite, consentRgpd, ventes
         List<Client> moroccanClients = Arrays.asList(
-                new Client(null, "Mansouri", "Ahmed", "ahmed.mans@gmail.com", "0661122334", "Pénicilline", 120, true, null),
-                new Client(null, "Bennani", "Fatema Zahra", "fz.bennani@yahoo.fr", "0662233445", null, 45, true, null),
-                new Client(null, "El Amrani", "Yassine", "yassine.amr@gmail.com", "0663344556", "Pollen", 210, true, null),
-                new Client(null, "Benjelloun", "Khadija", "khadija.benj@outlook.com", "0664455667", null, 350, true, null),
-                new Client(null, "Tazi", "Mehdi", "mehdi.tazi@gmail.com", "0665566778", "Aspirine", 10, true, null),
-                new Client(null, "Alami", "Zineb", "zineb.alami@gmail.com", "0666677889", null, 85, true, null),
-                new Client(null, "Idrissi", "Omar", "omar.idrissi@gmail.com", "0667788990", null, 0, true, null),
-                new Client(null, "Raoui", "Latifa", "latifa.raoui@gmail.com", "0668899001", "Pénicilline", 150, true, null),
-                new Client(null, "Cherkaoui", "Hassan", "hassan.cherk@gmail.com", "0669900112", null, 60, true, null),
-                new Client(null, "Ait Ahmed", "Najat", "najat.ait@gmail.com", "0660011223", "Lactose", 95, true, null),
-                new Client(null, "Saidi", "Mustapha", "musta.saidi@gmail.com", "0651122334", null, 15, true, null),
-                new Client(null, "Lahlou", "Amine", "amine.lahlou@gmail.com", "0652233445", null, 300, true, null),
-                new Client(null, "Jabri", "Siham", "siham.jabri@gmail.com", "0653344556", "Fruits à coque", 25, true, null),
-                new Client(null, "Berrada", "Rachid", "rachid.berrada@gmail.com", "0654455667", null, 410, true, null),
-                new Client(null, "Mernissi", "Salma", "salma.mer@gmail.com", "0655566778", null, 55, true, null),
-                new Client(null, "Slaoui", "Anas", "anas.slaoui@gmail.com", "0656677889", null, 130, true, null),
-                new Client(null, "Filali", "Meryem", "meryem.filali@gmail.com", "0657788990", "Sulfamides", 20, true, null),
-                new Client(null, "Belkhayat", "Hamza", "hamza.belk@gmail.com", "0658899001", null, 75, true, null),
-                new Client(null, "Oulidi", "Laila", "laila.oulidi@gmail.com", "0659900112", null, 110, true, null),
-                new Client(null, "Bakkali", "Said", "said.bakkali@gmail.com", "0650011223", null, 5, true, null)
+                new Client(null, "Mansouri", "Ahmed", "ahmed.mans@gmail.com", "0661122334", "Pénicilline", true, null),
+                new Client(null, "Bennani", "Fatema Zahra", "fz.bennani@yahoo.fr", "0662233445", null, true, null),
+                new Client(null, "El Amrani", "Yassine", "yassine.amr@gmail.com", "0663344556", "Pollen", true, null),
+                new Client(null, "Benjelloun", "Khadija", "khadija.benj@outlook.com", "0664455667", null, true, null),
+                new Client(null, "Tazi", "Mehdi", "mehdi.tazi@gmail.com", "0665566778", "Aspirine", true, null),
+                new Client(null, "Alami", "Zineb", "zineb.alami@gmail.com", "0666677889", null, true, null),
+                new Client(null, "Idrissi", "Omar", "omar.idrissi@gmail.com", "0667788990", null, true, null),
+                new Client(null, "Raoui", "Latifa", "latifa.raoui@gmail.com", "0668899001", "Pénicilline", true, null),
+                new Client(null, "Cherkaoui", "Hassan", "hassan.cherk@gmail.com", "0669900112", null, true, null),
+                new Client(null, "Ait Ahmed", "Najat", "najat.ait@gmail.com", "0660011223", "Lactose", true, null),
+                new Client(null, "Saidi", "Mustapha", "musta.saidi@gmail.com", "0651122334", null, true, null),
+                new Client(null, "Lahlou", "Amine", "amine.lahlou@gmail.com", "0652233445", null, true, null),
+                new Client(null, "Jabri", "Siham", "siham.jabri@gmail.com", "0653344556", "Fruits à coque", true, null),
+                new Client(null, "Berrada", "Rachid", "rachid.berrada@gmail.com", "0654455667", null, true, null),
+                new Client(null, "Mernissi", "Salma", "salma.mer@gmail.com", "0655566778", null, true, null),
+                new Client(null, "Slaoui", "Anas", "anas.slaoui@gmail.com", "0656677889", null, true, null),
+                new Client(null, "Filali", "Meryem", "meryem.filali@gmail.com", "0657788990", "Sulfamides", true, null),
+                new Client(null, "Belkhayat", "Hamza", "hamza.belk@gmail.com", "0658899001", null, true, null),
+                new Client(null, "Oulidi", "Laila", "laila.oulidi@gmail.com", "0659900112", null, true, null),
+                new Client(null, "Bakkali", "Said", "said.bakkali@gmail.com", "0650011223", null, true, null)
         );
         clientRepository.saveAll(moroccanClients);
 

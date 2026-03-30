@@ -6,8 +6,10 @@ import java.time.LocalDate;
 @Data
 public class LotDTO {
     private Long id;
-    private String numeroLot;
+    private String lotId;
     private LocalDate fabrication;
-    private LocalDate expiration;
+    private LocalDate dateExpiration;
     private Integer quantite;
+    private Long medicamentId;
+    private MedicamentDTO medicament;
 }

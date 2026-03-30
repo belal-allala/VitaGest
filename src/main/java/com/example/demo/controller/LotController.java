@@ -25,6 +25,11 @@ public class LotController {
         return ResponseEntity.ok(lotService.getAllLots());
     }
 
+    @GetMapping("/medicament/{medicamentId}")
+    public ResponseEntity<List<LotDTO>> getLotsByMedicament(@PathVariable Long medicamentId) {
+        return ResponseEntity.ok(lotService.getLotsByMedicament(medicamentId));
+    }
+
     @GetMapping("/{id}")
     public ResponseEntity<LotDTO> getLotById(@PathVariable Long id) {
         LotDTO lot = lotService.getLotById(id);

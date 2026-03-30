@@ -12,4 +12,5 @@ public class AuditLogDTO {
     private LocalDateTime timestamp;
     private String details;
     private Long userId;
+    private String userName;
 }

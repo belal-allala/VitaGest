@@ -45,4 +45,17 @@ public class UserController {
         userService.deleteUser(id);
         return ResponseEntity.noContent().build();
     }
+
+    @PatchMapping("/{id}/toggle-active")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<UserDTO> toggleActiveStatus(@PathVariable Long id) {
+        return ResponseEntity.ok(userService.toggleActiveStatus(id));
+    }
+
+    @PatchMapping("/{id}/reset-password")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<Void> resetPassword(@PathVariable Long id, @RequestBody java.util.Map<String, String> body) {
+        userService.resetPassword(id, body.get("password"));
+        return ResponseEntity.noContent().build();
+    }
 }

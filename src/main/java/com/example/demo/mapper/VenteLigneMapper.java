@@ -8,6 +8,7 @@ import org.mapstruct.Mapping;
 @Mapper(componentModel = "spring")
 public interface VenteLigneMapper {
     @Mapping(source = "medicament.id", target = "medicamentId")
+    @Mapping(source = "medicament", target = "medicament")
     VenteLigneDTO toDTO(VenteLigne venteLigne);
     
     @Mapping(source = "medicamentId", target = "medicament.id")

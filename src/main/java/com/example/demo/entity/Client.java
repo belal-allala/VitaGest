@@ -17,7 +17,6 @@ public class Client {
     private String email;
     private String tel;
     private String allergies;
-    private Integer pointsFidelite = 0;
     private Boolean consentRgpd = false;
 
     @OneToMany(mappedBy = "client")

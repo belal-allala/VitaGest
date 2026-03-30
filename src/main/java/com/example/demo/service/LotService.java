@@ -28,6 +28,12 @@ public class LotService {
                 .collect(Collectors.toList());
     }
 
+    public List<LotDTO> getLotsByMedicament(Long medicamentId) {
+        return lotRepository.findByMedicamentId(medicamentId).stream()
+                .map(lotMapper::toDTO)
+                .collect(Collectors.toList());
+    }
+
     public LotDTO getLotById(Long id) {
         return lotRepository.findById(id)
                 .map(lotMapper::toDTO)

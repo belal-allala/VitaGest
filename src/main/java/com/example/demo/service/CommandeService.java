@@ -33,12 +33,32 @@ public class CommandeService {
         commande.setDate(LocalDateTime.now());
         commande.setStatut("BROUILLON");
 
-        BigDecimal total = commande.getLignes().stream()
-                .map(ligne -> ligne.getPrixAchat().multiply(BigDecimal.valueOf(ligne.getQuantite())))
+        if (commande.getLignes() != null) {
+            commande.getLignes().forEach(ligne -> ligne.setCommande(commande));
+        }
+
+        BigDecimal total = (commande.getLignes() == null) ? BigDecimal.ZERO :
+                commande.getLignes().stream()
+                .map(ligne -> {
+                    BigDecimal prix = ligne.getPrixAchat() != null ? ligne.getPrixAchat() : BigDecimal.ZERO;
+                    return prix.multiply(BigDecimal.valueOf(ligne.getQuantite()));
+                })
                 .reduce(BigDecimal.ZERO, BigDecimal::add)
                 .setScale(2, RoundingMode.HALF_UP);
         commande.setTotalAmount(total);
 
+        return commandeMapper.toDTO(commandeRepository.save(commande));
+    }
+
+    @Transactional
+    @AuditAction(action = "VALIDATION_COMMANDE", entityName = "Commande")
+    public CommandeDTO validerCommande(Long commandeId) {
+        Commande commande = commandeRepository.findById(commandeId)
+                .orElseThrow(() -> new ResourceNotFoundException("Commande not found with ID: " + commandeId));
+        if (!"BROUILLON".equals(commande.getStatut())) {
+            throw new IllegalStateException("Seules les commandes en brouillon peuvent être validées.");
+        }
+        commande.setStatut("EN_ATTENTE");
         return commandeMapper.toDTO(commandeRepository.save(commande));
     }
 
@@ -106,8 +126,15 @@ public class CommandeService {
                     }
                     Commande updatedCommande = commandeMapper.toEntity(commandeDTO);
                     updatedCommande.setId(existingCommande.getId());
-                    BigDecimal total = updatedCommande.getLignes().stream()
-                        .map(ligne -> ligne.getPrixAchat().multiply(BigDecimal.valueOf(ligne.getQuantite())))
+                    if (updatedCommande.getLignes() != null) {
+                        updatedCommande.getLignes().forEach(ligne -> ligne.setCommande(updatedCommande));
+                    }
+                    BigDecimal total = (updatedCommande.getLignes() == null) ? BigDecimal.ZERO :
+                        updatedCommande.getLignes().stream()
+                        .map(ligne -> {
+                            BigDecimal prix = ligne.getPrixAchat() != null ? ligne.getPrixAchat() : BigDecimal.ZERO;
+                            return prix.multiply(BigDecimal.valueOf(ligne.getQuantite()));
+                        })
                         .reduce(BigDecimal.ZERO, BigDecimal::add)
                         .setScale(2, RoundingMode.HALF_UP);
                     updatedCommande.setTotalAmount(total);

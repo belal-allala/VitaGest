@@ -24,6 +24,5 @@ public class ClientDTO {
     private String tel;
 
     private String allergies;
-    private Integer pointsFidelite;
     private Boolean consentRgpd;
 }

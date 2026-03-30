@@ -1,5 +1,6 @@
 package com.example.demo.dto;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -18,4 +19,9 @@ public class UserDTO {
     
     @NotNull(message = "Le rôle est obligatoire")
     private RoleDTO role;
+
+    @JsonProperty("isActive")
+    private boolean active = true;
+    
+    private String password;
 }
